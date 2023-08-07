@@ -1,6 +1,6 @@
-# CS 564 Project 3: Join Algorithms
+# Hash Join (README modified by Nadim Isaac from CS564 Join Algorithm Project, credit to Professor Kevin Gaffney)
 
-The join is a fundamental operation in relational data processing that finds matching rows between two tables. In this project, you will implement, test, and benchmark a disk-based join algorithm. Your goal is to efficiently use memory and disk resources to return the answer to the following query.
+The join is a fundamental operation in relational data processing that finds matching rows between two tables. In this project, I will implement, test, and benchmark a disk-based join algorithm. The goal is to efficiently use memory and disk resources to return the answer to the following query.
 
 ```sql
 SELECT R.b, S.b
@@ -10,23 +10,9 @@ WHERE R.a = S.a;
 
 ## Algorithms
 
-You will implement **one of three** disk-based join algorithms: block nested loop join (BNLJ), sort-merge join (SMJ), and hash join (HJ). Sketches of the algorithms are provided below. Please refer to the lecture slides and the textbook for more relevant information on the algorithms. If you choose to implement SMJ or HJ, you should implement the two-pass variant of the algorithm.
+Two pass variant of Hash Join ..
 
 ### Sketches
-
-#### Block nested loop join (BNLJ)
-
-- For each block $R_i$ of $B - 2$ pages in $R$:
-	- For each tuple $s$ in $S$:
-		- For each tuple $r$ in $R_i$:
-			- If $r.a = s.a$ then output $(r.b, s.b)$.
-
-#### Sort-merge join (SMJ)
-
-- For each block $R_i$ of $B$ pages in $R$, sort $R_i$ by $a$ and write to disk.
-- For each block $S_i$ of $B$ pages in $S$, sort $S_i$ by $a$ and write to disk.
-- Repeat while there is still input:
-	- Find the first tuples $r$ and $s$ such that $r.a = s.a$, advance the cursors pointing to $r$ and $s$, and output $(r.b, s.b)$.
 
 #### Hash join (HJ)
 
@@ -40,11 +26,11 @@ You will implement **one of three** disk-based join algorithms: block nested loo
 
 ### Modifications
 
-To an extent, you are free to make minor modifications to the algorithm to improve performance. However, your algorithm must be clearly recognizable as a variant of the original. For BNLJ, your algorithm must compute the join with a block nested loop structure. For SMJ, your algorithm must compute the join by sorting and merging. For HJ, your algorithm must compute the join by partitioning and hashing. In addition, your algorithm must be single-threaded.
+Single threaded permitted only.
 
 ## Implementation
 
-You will implement the following function in `src/join.cpp`.
+The following function will be implemented in `src/join.cpp`.
 
 ```cpp
 int join(File &file,
@@ -62,13 +48,13 @@ The function parameters are explained below.
 - **`buffer`**: A contiguous memory region of buffer frames.
 - **`numFrames`**: The number of frames in the buffer.
 
-The function must return the number of tuples in the result.
+The function will return the number of tuples in the result.
 
 ### Input
 
-Your implementation will be run on randomly-generated databases. Each database will consist of two tables, `R` and `S`, each with two integer columns, `a` and `b`. You will evaluate the SQL query above.
+The implementation will be run on randomly-generated databases. Each database will consist of two tables, `R` and `S`, each with two integer columns, `a` and `b`. I will evaluate the SQL query above.
 
-Given $P_R$ pages in `R`, $P_S$ pages in `S`, and $B$ buffer frames, you may make the following assumptions about the input to your algorithm.
+Given $P_R$ pages in `R`, $P_S$ pages in `S`, and $B$ buffer frames, the following assumptions will be made about the input to your algorithm.
 
 - The page size is 4096 bytes. The frame size is the same as the page size.
 - $0 < P_R \le P_S$. The file consists of $P_R$ pages of table `R`, followed immediately by $P_S$ pages of table `S`, followed immediately by $P_R$ of empty output pages.
@@ -79,25 +65,22 @@ Given $P_R$ pages in `R`, $P_S$ pages in `S`, and $B$ buffer frames, you may mak
 
 ### Output
 
-You should write your output to the pages that immediately follow table `S`. Your output table should be packed. If there is a page in the output table with fewer than 512 tuples, it should be the last page in the table. You may write the tuples in any order.
+The output will be written to the pages that immediately follow table `S`. The output table will be packed. If there is a page in the output table with fewer than 512 tuples, it will be the last page in the table. Tuples are written in random order.
 
-Any remaining pages in the file after your output table can be created as needed by your algorithm, and they will be ignored by the caller. You may not create additional files or perform I/O outside of using the `File` class.
 
 ### Constraints
 
 #### I/O cost
 
-We will measure the I/O cost of your implementation. Given $P_R$ pages in `R`, $P_S$ pages in `S`, and $B$ buffer frames, the number of I/Os your implementation incurs must not exceed the following limits. 
+Given $P_R$ pages in `R`, $P_S$ pages in `S`, and $B$ buffer frames, the number of I/Os this implementation incurs will not exceed the following limits. 
 
 | Algorithm | Maximum number of reads                                | Maximum number of writes |
 | --------- | ------------------------------------------------------ | ------------------------ |
-| BNLJ      | $P_R + P_S \left\lceil \frac{P_R}{B - 2} \right\rceil$ | $P_R$                    |
-| SMJ       | $2(P_R + P_S)$                                         | $2P_R + P_S$             |
 | HJ        | $2(P_R + P_S)$                                         | $2P_R + P_S$             |
 
 #### Memory usage
 
-We will also measure the peak heap memory usage of your implementation. You may use only the provided buffer to read in table data, and you should aim to allocate minimal heap memory beyond the provided buffer. However, you will likely need some additional memory for data structures and bookkeeping. We will allow an additional 100 KiB plus 1 KiB for each page in the buffer. Thus, if your peak heap memory usage is less than or equal to $2^{10}(100 + B)$ bytes (not including the size of the buffer), you will receive full credit for this portion. In practice, this requirement should be easily satisfied. Instructions for measuring peak heap memory usage are below.
+Peak heap memory usage shall be less than or equal to $2^{10}(100 + B)$ bytes (not including the size of the buffer). Instructions for measuring peak heap memory usage are below.
 
 ## Building
 
@@ -145,32 +128,19 @@ Optionally, run the tests. Some tests will fail if you have just started the pro
 ctest .
 ```
 
-To measure peak heap memory usage, run the provided script. This will only work on a Linux machine with Valgrind installed. We recommend using one of the CSL Linux machines.
+To measure peak heap memory usage, run the provided script. This will only work on a Linux machine with Valgrind installed.
 
 ```bash
 ./test_memory.sh
 ```
 
-## Developing
-
-If you decide to host your code on GitHub, **use a private repository**. Points may be deducted if you use a public repository.
-
-You may not create, move, or delete any files or directories, with the exception of the build directory. The only files you may modify are `src/join.cpp` and `src/test/test_join.cpp`.
-
 ### Tests
 
-Tests are located in the subdirectory `src/test`. Tests for correctness and I/O cost of your implementation can be found in `src/test/test_join.cpp`. You are free to add any additional tests to this file; however, it will be overwritten with the original when we grade your submission. Passing these tests will account for the majority of your project grade. You need not worry about `src/test/test_file.cpp`.
+Tests are located in the subdirectory `src/test`. Tests for correctness and I/O cost of your implementation can be found in `src/test/test_join.cpp`.
 
-### Style
-
-You are expected to develop your code using good C++ style. You don't have to follow any specific convention, but ensure that your code is consistent, organized, clear, and well-documented.
 
 ## Leaderboard
 
 Within each join algorithm (BNLJ, SMJ, HJ), the group with the fastest submission will receive 5 bonus points for this project. The group with the fastest overall submission (regardless of algorithm) will receive an additional 5 bonus points. Thus, you have the opportunity to earn up to 10 bonus points for this project. To be considered for the leaderboard, your implementation must be correct and satisfy the constraints on I/O cost and peak heap memory usage. Late submissions will not be considered.
 
 To evaluate submissions, we will run your code repeatedly and compute the mean latency. If there are extremely close ties, we may award bonus points to multiple groups. In the performance evaluation database, `R` and `S` will have 100,000 pages each. The buffer will have 1000 frames.
-
-## Deliverables
-
-Submit a zipped archive (`.zip`) of the top-level project directory to Canvas. Do not include build files in your submission. There should only be one submission per group. Points may be deducted if you do not follow these instructions.
