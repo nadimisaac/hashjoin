@@ -1,4 +1,8 @@
-# Hash Join (README modified by Nadim Isaac from CS564 Join Algorithm Project, credit to Professor Kevin Gaffney)
+# Hash Join 
+
+## (README modified by Nadim Isaac for Public GitHub Usage) 
+
+#### Credit to Professor Kevin Gaffney for original README file
 
 The join is a fundamental operation in relational data processing that finds matching rows between two tables. In this project, I will implement, test, and benchmark a disk-based join algorithm. The goal is to efficiently use memory and disk resources to return the answer to the following query.
 
