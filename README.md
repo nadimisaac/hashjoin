@@ -98,12 +98,6 @@ Clone the repository to your computer. If you're unfamiliar with GitHub, you can
 git clone URL
 ```
 
-Navigate into the project directory.
-
-```bash
-cd project-3
-```
-
 Create and navigate into a build directory.
 
 ```bash
